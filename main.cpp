@@ -1,4 +1,5 @@
 #include "bitboard.h"
+#include "move_generation.h"  // Include the move generation header
 #include <iostream>
 
 using namespace std;
@@ -6,6 +7,8 @@ using namespace std;
 int main() {
     Bitboard whitePawns = 0ULL;
     Bitboard blackPawns = 0ULL;
+    Bitboard emptySquares = 0ULL;
+    Bitboard allPieces = 0ULL;
 
     // Initialize white pawns on row 2
     for (int i = A2; i <= H2; ++i) {
@@ -17,25 +20,25 @@ int main() {
         blackPawns = set_bit(blackPawns, i);
     }
 
-    cout << "White Pawns Bitboard:" << endl;
-    print_bitboard(whitePawns);
+    // Set the empty squares to be any square that does not have a piece
+    allPieces = whitePawns | blackPawns;
+    emptySquares = ~allPieces;
 
-    cout << "Black Pawns Bitboard:" << endl;
-    print_bitboard(blackPawns);
+    // Test pawn move generation
+    cout << "White Pawn Moves:" << endl;
+    Bitboard whitePawnMoves = generate_white_pawn_moves(whitePawns, emptySquares, blackPawns);
+    print_bitboard(whitePawnMoves);
 
-    // Example move: Move the white pawn from A2 to A3
-    whitePawns = clear_bit(whitePawns, A2);
-    whitePawns = set_bit(whitePawns, A3);
+    // Initialize a knight at B1 (square index 1)
+    Bitboard knight = 0ULL;
+    knight = set_bit(knight, G1);
 
-    cout << "After moving A2 to A3:" << endl;
-    print_bitboard(whitePawns);
+    // Test knight move generation
+    cout << "Knight Moves from G1:" << endl;
+    Bitboard knightMoves = generate_knight_moves(knight, allPieces);
+    print_bitboard(knightMoves);
 
-    // Example move: Move the white pawn from B2 to B4
-    whitePawns = clear_bit(whitePawns, B2);
-    whitePawns = set_bit(whitePawns, B4);
-
-    cout << "After moving B2 to B4:" << endl;
-    print_bitboard(whitePawns);
+    // Test sliding pieces later (bishop/rook/queen) after you confirm these work
 
     return 0;
 }
