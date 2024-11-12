@@ -1,5 +1,5 @@
 #include "bitboard.h"
-#include "move_generation.h"  // Include the move generation header
+#include "move_generation.h"
 #include <iostream>
 
 using namespace std;
@@ -11,11 +11,11 @@ int main() {
     Bitboard allPieces = 0ULL;
 
     // Initialize white pawns on row 2
-    // for (int i = A2; i <= H2; ++i) {
-    //     whitePawns = set_bit(whitePawns, i);
-    // }
+    for (int i = A2; i <= H2; ++i) {
+        whitePawns = set_bit(whitePawns, i);
+    }
 
-    //Initialize black pawns on row 7
+    // Initialize black pawns on row 7
     for (int i = A7; i <= H7; ++i) {
         blackPawns = set_bit(blackPawns, i);
     }
