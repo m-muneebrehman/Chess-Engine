@@ -31,13 +31,41 @@ Bitboard generate_knight_moves(Bitboard knight, Bitboard allPieces) {
 Bitboard generate_sliding_moves(Bitboard piece, Bitboard allPieces, int direction) {
     Bitboard moves = 0ULL;
     Bitboard ray = piece;
-    while (ray) {
-        ray <<= direction; // Move in the specified direction (left, right, up, or down)
-        if (ray & allPieces) break; // Stop at the first occupied square
-        moves |= ray; // Add the move to the list
+
+    // Define edge masks to prevent wraparound
+    const Bitboard FILE_A_MASK = 0x7F7F7F7F7F7F7F7FULL; // Clears file A
+    const Bitboard FILE_H_MASK = 0xFEFEFEFEFEFEFEFEULL; // Clears file H
+
+    while (true) {
+        // Shift in the specified direction
+        if (direction == 1) { // Right
+            ray = (ray << 1) & FILE_H_MASK; 
+        } else if (direction == -1) { // Left
+            ray = (ray >> 1) & FILE_A_MASK; 
+        } else if (direction == 8) { // Up
+            ray <<= 8; 
+        } else if (direction == -8) { // Down
+            ray >>= 8; 
+        } else if (direction == 9) { // Up-Right
+            ray = (ray << 9) & FILE_H_MASK; 
+        } else if (direction == 7) { // Up-Left
+            ray = (ray << 7) & FILE_A_MASK;
+        } else if (direction == -9) { // Down-Left
+            ray = (ray >> 9) & FILE_A_MASK; 
+        } else if (direction == -7) { // Down-Right
+            ray = (ray >> 7) & FILE_H_MASK; 
+        } else {
+            break; // Invalid direction
+        }
+
+        if (!ray) break; // Stop if ray moves off the board
+        moves |= ray; // Add valid move to the result
+        if (ray & allPieces) break; // Stop if an occupied square is encountered
     }
-    return moves;
+
+    return moves & ~allPieces;
 }
+
 
 
 Bitboard generate_king_moves(Bitboard king, Bitboard allPieces) {
