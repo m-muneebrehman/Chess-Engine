@@ -6,10 +6,9 @@
 #include <iostream>
 
 int main() {
-    
-    Board board;
-    board.make_move(B1, C3, board.whiteKnights);
-    board.print_board();
 
+    Board board;
+    board.make_move(B1, C3, board.whiteKnight1);
+    board.print_board();
     return 0;
 }
