@@ -72,38 +72,36 @@ void Board::make_move(Bitboard from, Bitboard to, Bitboard &piece) {
     // Update all pieces and empty squares
     update_all();
 }
-
-
 void Board::capture_piece(Bitboard to) {
-    // Store the bitboards for white and black pieces in arrays
-    Bitboard whitePiecesArr[16] = { whitePawnA, whitePawnB, whitePawnC, whitePawnD, 
-                                    whitePawnE, whitePawnF, whitePawnG, whitePawnH,
-                                    whiteKnight1, whiteKnight2, whiteBishop1, whiteBishop2, 
-                                    whiteRook1, whiteRook2, whiteQueen, whiteKing };
 
-    Bitboard blackPiecesArr[16] = { blackPawnA, blackPawnB, blackPawnC, blackPawnD, 
-                                    blackPawnE, blackPawnF, blackPawnG, blackPawnH,
-                                    blackKnight1, blackKnight2, blackBishop1, blackBishop2, 
-                                    blackRook1, blackRook2, blackQueen, blackKing };
+
+    // Store pointers to the bitboards for white and black pieces
+    Bitboard* whitePiecesArr[16] = { &whitePawnA, &whitePawnB, &whitePawnC, &whitePawnD,
+                                     &whitePawnE, &whitePawnF, &whitePawnG, &whitePawnH,
+                                     &whiteKnight1, &whiteKnight2, &whiteBishop1, &whiteBishop2,
+                                     &whiteRook1, &whiteRook2, &whiteQueen, &whiteKing };
+
+    Bitboard* blackPiecesArr[16] = { &blackPawnA, &blackPawnB, &blackPawnC, &blackPawnD,
+                                     &blackPawnE, &blackPawnF, &blackPawnG, &blackPawnH,
+                                     &blackKnight1, &blackKnight2, &blackBishop1, &blackBishop2,
+                                     &blackRook1, &blackRook2, &blackQueen, &blackKing };
 
     // Check if the captured piece is white and update the white pieces
     if ((1ULL << to) & whitePieces) {
-        for (int i = 0; i < 16; ++i) {
-            if ((1ULL << to) & whitePiecesArr[i]) {
-                // Clear the captured piece's bit from the corresponding bitboard
-                whitePiecesArr[i] = clear_bit(whitePiecesArr[i], to);
-                break;  // Once the captured piece is found, stop searching
+        for (int i = 0; i < 16; i++) {
+            if ((1ULL << to) & *whitePiecesArr[i]) {
+
+                *whitePiecesArr[i] &= ~(1ULL << to);
             }
         }
     }
 
     // Check if the captured piece is black and update the black pieces
     if ((1ULL << to) & blackPieces) {
-        for (int i = 0; i < 16; ++i) {
-            if ((1ULL << to) & blackPiecesArr[i]) {
-                // Clear the captured piece's bit from the corresponding bitboard
-                blackPiecesArr[i] = clear_bit(blackPiecesArr[i], to);
-                break;  // Once the captured piece is found, stop searching
+        for (int i = 0; i < 16; i++) {
+            if ((1ULL << to) & *blackPiecesArr[i]) {
+
+                *blackPiecesArr[i] &= ~(1ULL << to);
             }
         }
     }
