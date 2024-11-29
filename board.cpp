@@ -8,7 +8,7 @@ Board::Board() {
     initialize();
 }
 
-// Initialize the board with all pieces in their starting positions
+
 void Board::initialize() {
     // Initialize white pawns
     whitePawnA = set_bit(0ULL, A2);    whitePawnB = set_bit(0ULL, B2);   whitePawnC = set_bit(0ULL, C2);
@@ -51,7 +51,8 @@ void Board::initialize() {
     allPieces = whitePieces | blackPieces;
     emptySquares = ~allPieces & 0xFFFFFFFFFFFFFFFFULL;
 }
-// Make a move from one position to another for a given piece
+
+
 void Board::make_move(Bitboard from, Bitboard to, Bitboard &piece) {
     // First, validate the move
     if (!is_valid_move(from, to, piece)) {
@@ -59,73 +60,82 @@ void Board::make_move(Bitboard from, Bitboard to, Bitboard &piece) {
         return;
     }
 
-    // Check if the move is a capture (the 'to' position is occupied by an opponent's piece)
-    if (to & (blackPieces | whitePieces)) {
-        // If the opponent's piece is on the 'to' square, it's a capture.
-        if (to & whitePieces) {
-            // Black piece is captured. Find which black piece is captured and set its bitboard to 0ULL
-            if (to & whitePawnA) whitePawnA = 0ULL;
-            else if (to & whitePawnB) whitePawnB = 0ULL;
-            else if (to & whitePawnC) whitePawnC = 0ULL;
-            else if (to & whitePawnD) whitePawnD = 0ULL;
-            else if (to & whitePawnE) whitePawnE = 0ULL;
-            else if (to & whitePawnF) whitePawnF = 0ULL;
-            else if (to & whitePawnG) whitePawnG = 0ULL;
-            else if (to & whitePawnH) whitePawnH = 0ULL;
-            else if (to & whiteKnight1) whiteKnight1 = 0ULL;
-            else if (to & whiteKnight2) whiteKnight2 = 0ULL;
-            else if (to & whiteBishop1) whiteBishop1 = 0ULL;
-            else if (to & whiteBishop2) whiteBishop2 = 0ULL;
-            else if (to & whiteRook1) whiteRook1 = 0ULL;
-            else if (to & whiteRook2) whiteRook2 = 0ULL;
-            else if (to & whiteQueen) whiteQueen = 0ULL;
-            else if (to & whiteKing) whiteKing = 0ULL;
-        }
-        else if (to & blackPieces) {
-            // White piece is captured. Find which white piece is captured and set its bitboard to 0ULL
-            if (to & blackPawnA) blackPawnA = 0ULL;
-            else if (to & blackPawnB) blackPawnB = 0ULL;
-            else if (to & blackPawnC) blackPawnC = 0ULL;
-            else if (to & blackPawnD) blackPawnD = 0ULL;
-            else if (to & blackPawnE) blackPawnE = 0ULL;
-            else if (to & blackPawnF) blackPawnF = 0ULL;
-            else if (to & blackPawnG) blackPawnG = 0ULL;
-            else if (to & blackPawnH) blackPawnH = 0ULL;
-            else if (to & blackKnight1) blackKnight1 = 0ULL;
-            else if (to & blackKnight2) blackKnight2 = 0ULL;
-            else if (to & blackBishop1) blackBishop1 = 0ULL;
-            else if (to & blackBishop2) blackBishop2 = 0ULL;
-            else if (to & blackRook1) blackRook1 = 0ULL;
-            else if (to & blackRook2) blackRook2 = 0ULL;
-            else if (to & blackQueen) blackQueen = 0ULL;
-            else if (to & blackKing) blackKing = 0ULL;
+    // Check if the move is a capture
+    if ((1ULL << to) & (blackPieces | whitePieces)) {
+        capture_piece(to);  // Capture the piece
+    }
+
+    // Move the piece to the new location
+    piece = clear_bit(piece, from);  // Clear the piece from the 'from' position
+    piece = set_bit(piece, to);      // Set the piece at the 'to' position
+
+    // Update all pieces and empty squares
+    update_all();
+}
+
+
+void Board::capture_piece(Bitboard to) {
+    // Store the bitboards for white and black pieces in arrays
+    Bitboard whitePiecesArr[16] = { whitePawnA, whitePawnB, whitePawnC, whitePawnD, 
+                                    whitePawnE, whitePawnF, whitePawnG, whitePawnH,
+                                    whiteKnight1, whiteKnight2, whiteBishop1, whiteBishop2, 
+                                    whiteRook1, whiteRook2, whiteQueen, whiteKing };
+
+    Bitboard blackPiecesArr[16] = { blackPawnA, blackPawnB, blackPawnC, blackPawnD, 
+                                    blackPawnE, blackPawnF, blackPawnG, blackPawnH,
+                                    blackKnight1, blackKnight2, blackBishop1, blackBishop2, 
+                                    blackRook1, blackRook2, blackQueen, blackKing };
+
+    // Check if the captured piece is white and update the white pieces
+    if ((1ULL << to) & whitePieces) {
+        for (int i = 0; i < 16; ++i) {
+            if ((1ULL << to) & whitePiecesArr[i]) {
+                // Clear the captured piece's bit from the corresponding bitboard
+                whitePiecesArr[i] = clear_bit(whitePiecesArr[i], to);
+                break;  // Once the captured piece is found, stop searching
+            }
         }
     }
 
-    // Move the piece to the new location by clearing it from the 'from' position and setting it at the 'to' position
-    piece = clear_bit(piece, from);  // Clear the piece from its current position
-    piece = set_bit(piece, to);      // Set the piece at the new position
-    
-    // After every move, update the emptySquares and allPieces bitboards
-    update_all();  // This will only update allPieces and emptySquares, not individual pieces
+    // Check if the captured piece is black and update the black pieces
+    if ((1ULL << to) & blackPieces) {
+        for (int i = 0; i < 16; ++i) {
+            if ((1ULL << to) & blackPiecesArr[i]) {
+                // Clear the captured piece's bit from the corresponding bitboard
+                blackPiecesArr[i] = clear_bit(blackPiecesArr[i], to);
+                break;  // Once the captured piece is found, stop searching
+            }
+        }
+    }
+
+    // After the capture, update the game state (all pieces and empty squares)
+    update_all();
 }
 
 
 void Board::update_all() {
-    // Do not recalculate whitePieces and blackPieces here. They are manually updated in the move function.
-      // Manually update whitePieces and blackPieces after a move
+    // Update whitePieces (combining all white pieces)
     whitePieces = whitePawnA | whitePawnB | whitePawnC | whitePawnD | whitePawnE | whitePawnF | whitePawnG | whitePawnH |
-                  whiteKnight1 | whiteKnight2 | whiteBishop1 | whiteBishop2 | whiteRook1 | whiteRook2 | whiteQueen | whiteKing;
+                  whiteKnight1 | whiteKnight2 | whiteBishop1 | whiteBishop2 | whiteRook1 | whiteRook2 | 
+                  whiteQueen | whiteKing;
 
+    // Update blackPieces (combining all black pieces)
     blackPieces = blackPawnA | blackPawnB | blackPawnC | blackPawnD | blackPawnE | blackPawnF | blackPawnG | blackPawnH |
-                  blackKnight1 | blackKnight2 | blackBishop1 | blackBishop2 | blackRook1 | blackRook2 | blackQueen | blackKing;
+                  blackKnight1 | blackKnight2 | blackBishop1 | blackBishop2 | blackRook1 | blackRook2 |
+                  blackQueen | blackKing;
 
     allPieces = whitePieces | blackPieces;
-    emptySquares = ~allPieces & 0xFFFFFFFFFFFFFFFFULL;  // All squares that are not occupied by pieces
+    emptySquares = ~allPieces & 0xFFFFFFFFFFFFFFFFULL; 
 }
 
-// Validate if the move is valid for a specific piece
+
 bool Board::is_valid_move(Bitboard from, Bitboard to, Bitboard &piece) const {
+   
+    if (to < 0 || to >= 64) {
+        std::cout << "Error: Invalid move. 'To' position is not a valid destination." << std::endl;
+        return false;
+    }
+
     // Ensure 'from' is part of the piece's current position
     if ((piece & (1ULL << from)) == 0) {
         std::cerr << "Error: 'From' position does not match the piece's current position." << std::endl;
@@ -152,7 +162,7 @@ bool Board::is_valid_move(Bitboard from, Bitboard to, Bitboard &piece) const {
     return true;
 }
 
-// Generate possible moves for a given piece based on its type
+
 Bitboard Board::generate_moves_for_piece(Bitboard position, Bitboard &piece) const {
     Bitboard moves = 0ULL;
 
@@ -218,27 +228,23 @@ Bitboard Board::generate_moves_for_piece(Bitboard position, Bitboard &piece) con
 }
 
 
-
-// Remove a piece from the board
 void Board::remove_piece(Bitboard square, Bitboard &piece) {
     piece = clear_bit(piece, square);
     update_all();
 }
 
-// Check if a square is empty
+
 bool Board::is_square_empty(Bitboard square) const {
     return (emptySquares & (1ULL << square)) != 0;
 }
 
 
-
-// Print the full board
 void Board::print_board() const {
     std::cout << "Current Board State:" << std::endl;
     print_bitboard(allPieces);
 }
 
-// Print a specific piece
+
 void Board::print_piece(Bitboard piece) const {
     print_bitboard(piece);
 }

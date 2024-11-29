@@ -40,6 +40,7 @@ public:
     void update_all();                                           // Update aggregate bitboards
     void print_board() const;                                    // Print the entire board
     void print_piece(Bitboard piece) const;                     // Print a specific piece bitboard
+    void capture_piece(Bitboard to);
 
     // Validation and move generation
     bool is_valid_move(Bitboard from, Bitboard to, Bitboard &piece) const; // Validate if a move is valid
