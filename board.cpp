@@ -1,6 +1,4 @@
 #include "board.h"
-#include "attack_map.h"
-#include "move_generation.h"
 #include <iostream>
 
 // Constructor: Initializes the board
@@ -270,4 +268,47 @@ void Board::print_piece(Bitboard piece) const {
     print_bitboard(piece);
 }
 
+// Generate all white pieces' legal moves
+Bitboard Board::generate_White_pieces() const{
+    return (
+        generate_king_moves(whiteKing, emptySquares) |        // King moves
+        generate_queen_moves(whiteQueen, emptySquares) |      // Queen moves
+        generate_bishop_moves(whiteBishop1, emptySquares) |   // Bishop 1 moves
+        generate_bishop_moves(whiteBishop2, emptySquares) |   // Bishop 2 moves
+        generate_knight_moves(whiteKnight1, emptySquares) |   // Knight 1 moves
+        generate_knight_moves(whiteKnight2, emptySquares) |   // Knight 2 moves
+        generate_rook_moves(whiteRook1, emptySquares) |       // Rook 1 moves
+        generate_rook_moves(whiteRook2, emptySquares) |       // Rook 2 moves
+        generate_white_pawn_moves(whitePawnA, emptySquares) | // White Pawn A moves
+        generate_white_pawn_moves(whitePawnB, emptySquares) | // White Pawn B moves
+        generate_white_pawn_moves(whitePawnC, emptySquares) | // White Pawn C moves
+        generate_white_pawn_moves(whitePawnD, emptySquares) | // White Pawn D moves
+        generate_white_pawn_moves(whitePawnE, emptySquares) | // White Pawn E moves
+        generate_white_pawn_moves(whitePawnF, emptySquares) | // White Pawn F moves
+        generate_white_pawn_moves(whitePawnG, emptySquares) | // White Pawn G moves
+        generate_white_pawn_moves(whitePawnH, emptySquares)   // White Pawn H moves
+    );
+}
+
+// Generate all black pieces' legal moves
+Bitboard Board::generate_Black_pieces() const{
+    return (
+        generate_king_moves(blackKing, emptySquares) |        // King moves
+        generate_queen_moves(blackQueen, emptySquares) |      // Queen moves
+        generate_bishop_moves(blackBishop1, emptySquares) |   // Bishop 1 moves
+        generate_bishop_moves(blackBishop2, emptySquares) |   // Bishop 2 moves
+        generate_knight_moves(blackKnight1, emptySquares) |   // Knight 1 moves
+        generate_knight_moves(blackKnight2, emptySquares) |   // Knight 2 moves
+        generate_rook_moves(blackRook1, emptySquares) |       // Rook 1 moves
+        generate_rook_moves(blackRook2, emptySquares) |       // Rook 2 moves
+        generate_black_pawn_moves(blackPawnA, emptySquares) | // Black Pawn A moves
+        generate_black_pawn_moves(blackPawnB, emptySquares) | // Black Pawn B moves
+        generate_black_pawn_moves(blackPawnC, emptySquares) | // Black Pawn C moves
+        generate_black_pawn_moves(blackPawnD, emptySquares) | // Black Pawn D moves
+        generate_black_pawn_moves(blackPawnE, emptySquares) | // Black Pawn E moves
+        generate_black_pawn_moves(blackPawnF, emptySquares) | // Black Pawn F moves
+        generate_black_pawn_moves(blackPawnG, emptySquares) | // Black Pawn G moves
+        generate_black_pawn_moves(blackPawnH, emptySquares)   // Black Pawn H moves
+    );
+}
 

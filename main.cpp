@@ -2,6 +2,7 @@
 #include "move_generation.h"
 #include "attack_map.h"
 #include "board.h"
+#include "chess_rules.h"
 
 #include <iostream>
 
@@ -10,15 +11,12 @@ int main() {
     Board board;
 
     // Scenario 1: White Pawn captures Black Pawn
-    board.make_move(H2, H4, board.whitePawnH);  
-    board.make_move(G7, G5, board.blackPawnG);   
-    board.make_move(H4, G5, board.whitePawnH); 
-    board.make_move(H7, H6, board.blackPawnH);
-    board.make_move(G5, G6, board.whitePawnH);
-    board.make_move(E7, E5, board.blackPawnE);
-    board.make_move(H1, H6, board.whiteRook2);
-    board.make_move(F8, H6, board.blackBishop2);
-    board.make_move(H6, H8, board.blackBishop2);
+    board.make_move(B1, C3, board.whiteKnight1);  
+    std::cout<<is_check(board, false)<<"\n";
+    board.make_move(C3, D5,board.whiteKnight1); 
+    std::cout<<is_check(board, false)<<"\n";
+    board.make_move(D5, C7, board.whiteKnight1); 
+    std::cout<<is_check(board, false);
 
 
     board.print_board();

@@ -1,7 +1,10 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+
 #include "bitboard.h"
+#include "attack_map.h"
+#include "move_generation.h"
 #include <iostream>
 
 class Board {
@@ -29,6 +32,13 @@ public:
     Bitboard allPieces;                // All pieces on the board
     Bitboard emptySquares;             // Squares without any pieces
 
+    // Check functions for different things
+    // bool is_check(bool isWhite);
+    // bool is_checkmate(bool isWhite);
+    // bool is_stalemate(bool isWhite);
+    // bool can_castle(bool isWhite, bool kingside);
+    // bool en_passant(int from, int to, bool isWhite);
+
     // Constructor
     Board();
 
@@ -44,6 +54,9 @@ public:
     // Validation and move generation
     bool is_valid_move(Bitboard from, Bitboard to, Bitboard &piece) const; // Validate if a move is valid
     Bitboard generate_moves_for_piece(Bitboard position, Bitboard &piece) const; // Generate all possible moves for a given piece
+    // Possible moves for white and Black pieces
+    Bitboard generate_White_pieces() const;
+    Bitboard generate_Black_pieces() const;
 };
 
 #endif
