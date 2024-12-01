@@ -7,7 +7,7 @@
 Bitboard generate_white_pawn_moves(Bitboard whitePawns, Bitboard emptySquares);
 Bitboard generate_black_pawn_moves(Bitboard blackPawns, Bitboard emptySquares);
 Bitboard generate_knight_moves(Bitboard knight, Bitboard allPieces);
-Bitboard generate_sliding_moves(Bitboard piece, Bitboard allPieces, int direction);
+Bitboard generate_sliding_moves(Bitboard piece, Bitboard allPieces, bool isRook, bool isBishop);
 Bitboard generate_king_moves(Bitboard king, Bitboard allPieces);
 Bitboard generate_rook_moves(Bitboard rook, Bitboard allPieces);
 Bitboard generate_bishop_moves(Bitboard bishop, Bitboard allPieces);

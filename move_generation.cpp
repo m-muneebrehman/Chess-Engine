@@ -1,4 +1,5 @@
 #include "move_generation.h"
+#include <vector>
 
 // Generate white pawn moves
 Bitboard generate_white_pawn_moves(Bitboard whitePawns, Bitboard emptySquares) {
@@ -32,8 +33,8 @@ Bitboard generate_knight_moves(Bitboard knight, Bitboard allPieces) {
     return knightMoves & ~allPieces;
 }
 
-// Generate sliding piece moves (rook, bishop, queen)
-Bitboard generate_sliding_moves(Bitboard piece, Bitboard allPieces, int direction) {
+/// Generate sliding piece moves (rook, bishop, queen)
+Bitboard generate_sliding_moves(Bitboard piece, Bitboard allPieces, bool isRook, bool isBishop) {
     Bitboard moves = 0ULL;
     Bitboard ray = piece;
 
@@ -44,24 +45,38 @@ Bitboard generate_sliding_moves(Bitboard piece, Bitboard allPieces, int directio
     // Direction handling
     const int directions[] = { 1, -1, 8, -8, 9, 7, -9, -7 }; // Right, Left, Up, Down, Up-Right, Up-Left, Down-Left, Down-Right
 
-    for (int i = 0; i < 8; i++) {
+    // Restrict directions based on piece type (rook, bishop, or queen)
+    std::vector<int> valid_directions;
+    if (isRook) {
+        // Rooks move horizontally (left, right) and vertically (up, down)
+        valid_directions = { 1, -1, 8, -8 };
+    } else if (isBishop) {
+        // Bishops move diagonally (up-right, up-left, down-left, down-right)
+        valid_directions = { 9, 7, -9, -7 };
+    } else if (!isRook && !isBishop) {
+        // Queens move like both rooks and bishops
+        valid_directions = { 1, -1, 8, -8, 9, 7, -9, -7 };
+    }
+
+    // Loop through valid directions
+    for (int i = 0; i < valid_directions.size(); i++) {
         ray = piece;
         while (true) {
-            if (directions[i] == 1) { // Right
+            if (valid_directions[i] == 1) { // Right
                 ray = (ray << 1) & FILE_H_MASK;
-            } else if (directions[i] == -1) { // Left
+            } else if (valid_directions[i] == -1) { // Left
                 ray = (ray >> 1) & FILE_A_MASK;
-            } else if (directions[i] == 8) { // Up
+            } else if (valid_directions[i] == 8) { // Up
                 ray <<= 8;
-            } else if (directions[i] == -8) { // Down
+            } else if (valid_directions[i] == -8) { // Down
                 ray >>= 8;
-            } else if (directions[i] == 9) { // Up-Right
+            } else if (valid_directions[i] == 9) { // Up-Right
                 ray = (ray << 9) & FILE_H_MASK;
-            } else if (directions[i] == 7) { // Up-Left
+            } else if (valid_directions[i] == 7) { // Up-Left
                 ray = (ray << 7) & FILE_A_MASK;
-            } else if (directions[i] == -9) { // Down-Left
+            } else if (valid_directions[i] == -9) { // Down-Left
                 ray = (ray >> 9) & FILE_A_MASK;
-            } else if (directions[i] == -7) { // Down-Right
+            } else if (valid_directions[i] == -7) { // Down-Right
                 ray = (ray >> 7) & FILE_H_MASK;
             }
 
@@ -94,33 +109,21 @@ Bitboard generate_king_moves(Bitboard king, Bitboard allPieces) {
 // Generate rook moves
 Bitboard generate_rook_moves(Bitboard rook, Bitboard allPieces) {
     Bitboard moves = 0ULL;
-    // Rook moves in four cardinal directions: up, down, left, right
-    moves |= generate_sliding_moves(rook, allPieces, 1);   // Right
-    moves |= generate_sliding_moves(rook, allPieces, -1);  // Left
-    moves |= generate_sliding_moves(rook, allPieces, 8);   // Up
-    moves |= generate_sliding_moves(rook, allPieces, -8);  // Down
-
-    return moves;
+    moves |= generate_sliding_moves(rook, allPieces, true, false);  
+    return moves & ~allPieces;
 }
 
 // Generate bishop moves
 Bitboard generate_bishop_moves(Bitboard bishop, Bitboard allPieces) {
     Bitboard moves = 0ULL;
-    // Bishop moves in four diagonal directions: up-right, up-left, down-right, down-left
-    moves |= generate_sliding_moves(bishop, allPieces, 9);   // Up-Right
-    moves |= generate_sliding_moves(bishop, allPieces, 7);   // Up-Left
-    moves |= generate_sliding_moves(bishop, allPieces, -9);  // Down-Left
-    moves |= generate_sliding_moves(bishop, allPieces, -7);  // Down-Right
+    moves |= generate_sliding_moves(bishop, allPieces, false, true);   
 
-    return moves;
+    return moves & ~allPieces;
 }
 
 // Generate queen moves
 Bitboard generate_queen_moves(Bitboard queen, Bitboard allPieces) {
     Bitboard moves = 0ULL;
-    // Queen combines rook and bishop moves
-    moves |= generate_rook_moves(queen, allPieces);
-    moves |= generate_bishop_moves(queen, allPieces);
-
-    return moves;
+    moves |= generate_sliding_moves(queen, allPieces, false, false);
+    return moves & ~allPieces;
 }

@@ -54,7 +54,7 @@ void Board::initialize() {
 
 
 void Board::make_move(Bitboard from, Bitboard to, Bitboard &piece) {
-    // First, validate the move
+  // First, validate the move
     if (!is_valid_move(from, to, piece)) {
         std::cerr << "Error: Invalid move from " << from << " to " << to << std::endl;
         return;
@@ -72,9 +72,9 @@ void Board::make_move(Bitboard from, Bitboard to, Bitboard &piece) {
     // Update all pieces and empty squares
     update_all();
 }
+
+
 void Board::capture_piece(Bitboard to) {
-
-
     // Store pointers to the bitboards for white and black pieces
     Bitboard* whitePiecesArr[16] = { &whitePawnA, &whitePawnB, &whitePawnC, &whitePawnD,
                                      &whitePawnE, &whitePawnF, &whitePawnG, &whitePawnH,
@@ -86,45 +86,68 @@ void Board::capture_piece(Bitboard to) {
                                      &blackKnight1, &blackKnight2, &blackBishop1, &blackBishop2,
                                      &blackRook1, &blackRook2, &blackQueen, &blackKing };
 
-    // Check if the captured piece is white and update the white pieces
+    // Check if the captured piece is white
     if ((1ULL << to) & whitePieces) {
-        for (int i = 0; i < 16; i++) {
+        // Iterate over the white pieces and clear the captured piece
+        for (int i = 0; i < 16; ++i) {
             if ((1ULL << to) & *whitePiecesArr[i]) {
-
-                *whitePiecesArr[i] &= ~(1ULL << to);
+                *whitePiecesArr[i] = clear_bit(*whitePiecesArr[i], to); // Clear the captured piece
+                break;
             }
         }
     }
-
-    // Check if the captured piece is black and update the black pieces
-    if ((1ULL << to) & blackPieces) {
-        for (int i = 0; i < 16; i++) {
+    // Check if the captured piece is black
+    else if ((1ULL << to) & blackPieces) {
+        // Iterate over the black pieces and clear the captured piece
+        for (int i = 0; i < 16; ++i) {
             if ((1ULL << to) & *blackPiecesArr[i]) {
-
-                *blackPiecesArr[i] &= ~(1ULL << to);
+                *blackPiecesArr[i] = clear_bit(*blackPiecesArr[i], to); // Clear the captured piece
+                break;
             }
         }
     }
 
-    // After the capture, update the game state (all pieces and empty squares)
+    // Update the allPieces and emptySquares bitboards after a capture
     update_all();
 }
 
 
+
 void Board::update_all() {
-    // Update whitePieces (combining all white pieces)
-    whitePieces = whitePawnA | whitePawnB | whitePawnC | whitePawnD | whitePawnE | whitePawnF | whitePawnG | whitePawnH |
-                  whiteKnight1 | whiteKnight2 | whiteBishop1 | whiteBishop2 | whiteRook1 | whiteRook2 | 
-                  whiteQueen | whiteKing;
+    // Initialize white and black pieces as 0
+    whitePieces = 0ULL;
+    blackPieces = 0ULL;
 
-    // Update blackPieces (combining all black pieces)
-    blackPieces = blackPawnA | blackPawnB | blackPawnC | blackPawnD | blackPawnE | blackPawnF | blackPawnG | blackPawnH |
-                  blackKnight1 | blackKnight2 | blackBishop1 | blackBishop2 | blackRook1 | blackRook2 |
-                  blackQueen | blackKing;
+    // Create arrays of pointers to each piece (white and black)
+    Bitboard* whitePiecesArr[16] = { &whitePawnA, &whitePawnB, &whitePawnC, &whitePawnD, 
+                                     &whitePawnE, &whitePawnF, &whitePawnG, &whitePawnH, 
+                                     &whiteKnight1, &whiteKnight2, &whiteBishop1, &whiteBishop2, 
+                                     &whiteRook1, &whiteRook2, &whiteQueen, &whiteKing };
 
+    Bitboard* blackPiecesArr[16] = { &blackPawnA, &blackPawnB, &blackPawnC, &blackPawnD, 
+                                     &blackPawnE, &blackPawnF, &blackPawnG, &blackPawnH, 
+                                     &blackKnight1, &blackKnight2, &blackBishop1, &blackBishop2, 
+                                     &blackRook1, &blackRook2, &blackQueen, &blackKing };
+
+    // Add each white piece to whitePieces if it's still in the game (not 0ULL)
+    for (int i = 0; i < 16; ++i) {
+        if (*whitePiecesArr[i] != 0ULL) {
+            whitePieces |= *whitePiecesArr[i];
+        }
+    }
+
+    // Add each black piece to blackPieces if it's still in the game (not 0ULL)
+    for (int i = 0; i < 16; ++i) {
+        if (*blackPiecesArr[i] != 0ULL) {
+            blackPieces |= *blackPiecesArr[i];
+        }
+    }
+
+    // Update allPieces and emptySquares
     allPieces = whitePieces | blackPieces;
     emptySquares = ~allPieces & 0xFFFFFFFFFFFFFFFFULL; 
 }
+
 
 
 bool Board::is_valid_move(Bitboard from, Bitboard to, Bitboard &piece) const {

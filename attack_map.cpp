@@ -1,4 +1,5 @@
 #include "attack_map.h"
+#include <vector>
 
 // Generate pawn attacks (white or black)
 Bitboard generate_pawn_attacks(Bitboard pawns, bool isWhite, Bitboard enemyPieces) {
@@ -47,81 +48,91 @@ Bitboard generate_king_attacks(Bitboard king, Bitboard enemyPieces) {
 
     return attack & enemyPieces;
 }
-Bitboard generate_sliding_attacks(Bitboard piece, Bitboard friendlyPieces, Bitboard enemyPieces, int direction) {
+// Generate sliding piece attacks (rook, bishop, queen)
+Bitboard generate_sliding_attacks(Bitboard piece, Bitboard friendlyPieces, Bitboard enemyPieces, bool isRook, bool isBishop) {
     Bitboard attacks = 0ULL;
-    Bitboard ray = piece;
+    
+    // Masks to prevent wraparound at file boundaries
+    const Bitboard FILE_A_MASK = 0x7F7F7F7F7F7F7F7FULL; // Clears file A
+    const Bitboard FILE_H_MASK = 0xFEFEFEFEFEFEFEFEULL; // Clears file H
 
-    const Bitboard NOT_FILE_A = 0x7F7F7F7F7F7F7F7FULL;
-    const Bitboard NOT_FILE_H = 0xFEFEFEFEFEFEFEFEULL;
+    // Direction handling
+    const int directions[] = { 1, -1, 8, -8, 9, 7, -9, -7 }; // Right, Left, Up, Down, Up-Right, Up-Left, Down-Left, Down-Right
 
-    while (true) {
-        if (direction == 1) { // Right
-            ray = (ray << 1) & NOT_FILE_H;
-        } else if (direction == -1) { // Left
-            ray = (ray >> 1) & NOT_FILE_A;
-        } else if (direction == 8) { // Up
-            ray <<= 8;
-        } else if (direction == -8) { // Down
-            ray >>= 8;
-        } else if (direction == 9) { // Up-Right
-            ray = (ray << 9) & NOT_FILE_H;
-        } else if (direction == 7) { // Up-Left
-            ray = (ray << 7) & NOT_FILE_A;
-        } else if (direction == -9) { // Down-Left
-            ray = (ray >> 9) & NOT_FILE_A;
-        } else if (direction == -7) { // Down-Right
-            ray = (ray >> 7) & NOT_FILE_H;
-        } else {
-            break; // Invalid direction
-        }
+    // Restrict directions based on piece type (rook, bishop, or queen)
+    std::vector<int> valid_directions;
+    if (isRook) {
+        // Rooks move horizontally (left, right) and vertically (up, down)
+        valid_directions = { 1, -1, 8, -8 };
+    } else if (isBishop) {
+        // Bishops move diagonally (up-right, up-left, down-left, down-right)
+        valid_directions = { 9, 7, -9, -7 };
+    } else if (!isRook && !isBishop) {
+        // Queens move like both rooks and bishops
+        valid_directions = { 1, -1, 8, -8, 9, 7, -9, -7 };
+    }
 
-        if (!ray) break; // Ray has moved off the board
+    // Loop through valid directions
+    for (int i = 0; i < valid_directions.size(); i++) {
+        Bitboard ray = piece;
+        while (true) {
+            // Move the ray in the specified direction
+            if (valid_directions[i] == 1) { // Right
+                ray = (ray << 1) & FILE_H_MASK;
+            } else if (valid_directions[i] == -1) { // Left
+                ray = (ray >> 1) & FILE_A_MASK;
+            } else if (valid_directions[i] == 8) { // Up
+                ray <<= 8;
+            } else if (valid_directions[i] == -8) { // Down
+                ray >>= 8;
+            } else if (valid_directions[i] == 9) { // Up-Right
+                ray = (ray << 9) & FILE_H_MASK;
+            } else if (valid_directions[i] == 7) { // Up-Left
+                ray = (ray << 7) & FILE_A_MASK;
+            } else if (valid_directions[i] == -9) { // Down-Left
+                ray = (ray >> 9) & FILE_A_MASK;
+            } else if (valid_directions[i] == -7) { // Down-Right
+                ray = (ray >> 7) & FILE_H_MASK;
+            }
 
-        // If we hit an enemy piece, register the attack
-        if (ray & enemyPieces) {
-            attacks |= ray;
-            break; // Stop after capturing or attacking an enemy piece
-        }
+            if (!ray) break; // If ray has moved off the board, stop
 
-        // If we hit a friendly piece, stop the sliding but don't add attacks
-        if (ray & friendlyPieces) {
-            break;
+            // If we hit an enemy piece, register the attack
+            if (ray & enemyPieces) {
+                attacks |= ray; // Add the attack position
+                break; // Stop after hitting an enemy piece
+            }
+
+            // If we hit a friendly piece, stop the attack (blocking piece)
+            if (ray & friendlyPieces) {
+                break;
+            }
+
+            attacks |= ray; // Continue adding attack positions
         }
     }
 
-    return attacks;
+    return attacks; // Return the final attack positions
 }
 
 // Generate rook attacks
 Bitboard generate_rook_attacks(Bitboard rook, Bitboard friendlyPieces, Bitboard enemyPieces) {
     Bitboard attacks = 0ULL;
-    // Rook moves in four cardinal directions: up, down, left, right
-    attacks |= generate_sliding_attacks(rook, friendlyPieces, enemyPieces, 1);   // Right
-    attacks |= generate_sliding_attacks(rook, friendlyPieces, enemyPieces, -1);  // Left
-    attacks |= generate_sliding_attacks(rook, friendlyPieces, enemyPieces, 8);   // Up
-    attacks |= generate_sliding_attacks(rook, friendlyPieces, enemyPieces, -8);  // Down
-
-    return attacks;
+    attacks |= generate_sliding_attacks(rook, friendlyPieces, enemyPieces, true, false);  
+    return attacks & enemyPieces;
 }
 
 // Generate bishop attacks
 Bitboard generate_bishop_attacks(Bitboard bishop, Bitboard friendlyPieces, Bitboard enemyPieces) {
     Bitboard attacks = 0ULL;
-    // Bishop moves in four diagonal directions: up-right, up-left, down-right, down-left
-    attacks |= generate_sliding_attacks(bishop, friendlyPieces, enemyPieces, 9);   // Up-Right
-    attacks |= generate_sliding_attacks(bishop, friendlyPieces, enemyPieces, 7);   // Up-Left
-    attacks |= generate_sliding_attacks(bishop, friendlyPieces, enemyPieces, -9);  // Down-Left
-    attacks |= generate_sliding_attacks(bishop, friendlyPieces, enemyPieces, -7);  // Down-Right
-
-    return attacks;
+    attacks |= generate_sliding_attacks(bishop, friendlyPieces, enemyPieces, false, true);   
+     return attacks & enemyPieces;
 }
 
 // Generate queen attacks
 Bitboard generate_queen_attacks(Bitboard queen, Bitboard friendlyPieces, Bitboard enemyPieces) {
     Bitboard attacks = 0ULL;
-    // Queen combines rook and bishop attacks
-    attacks |= generate_rook_attacks(queen, friendlyPieces, enemyPieces);
-    attacks |= generate_bishop_attacks(queen, friendlyPieces, enemyPieces);
-
-    return attacks;
+    // Queen combines rook and bishop attacks 
+    attacks |= generate_sliding_attacks(queen, friendlyPieces, enemyPieces, false, false);  
+   return attacks & enemyPieces;
 }
