@@ -312,3 +312,31 @@ Bitboard Board::generate_Black_pieces() const {
     );
 }
 
+void Board::copy(const Board &other) {
+    // Copy individual bitboards
+    whitePawnA = other.whitePawnA; whitePawnB = other.whitePawnB; whitePawnC = other.whitePawnC;
+    whitePawnD = other.whitePawnD; whitePawnE = other.whitePawnE; whitePawnF = other.whitePawnF;
+    whitePawnG = other.whitePawnG; whitePawnH = other.whitePawnH;
+
+    blackPawnA = other.blackPawnA; blackPawnB = other.blackPawnB; blackPawnC = other.blackPawnC;
+    blackPawnD = other.blackPawnD; blackPawnE = other.blackPawnE; blackPawnF = other.blackPawnF;
+    blackPawnG = other.blackPawnG; blackPawnH = other.blackPawnH;
+
+    whiteKnight1 = other.whiteKnight1; whiteKnight2 = other.whiteKnight2;
+    blackKnight1 = other.blackKnight1; blackKnight2 = other.blackKnight2;
+
+    whiteBishop1 = other.whiteBishop1; whiteBishop2 = other.whiteBishop2;
+    blackBishop1 = other.blackBishop1; blackBishop2 = other.blackBishop2;
+
+    whiteRook1 = other.whiteRook1; whiteRook2 = other.whiteRook2;
+    blackRook1 = other.blackRook1; blackRook2 = other.blackRook2;
+
+    whiteQueen = other.whiteQueen; blackQueen = other.blackQueen;
+    whiteKing = other.whiteKing; blackKing = other.blackKing;
+
+    // Copy combined bitboards
+    whitePieces = other.whitePieces;
+    blackPieces = other.blackPieces;
+    allPieces = other.allPieces;
+    emptySquares = other.emptySquares;
+}
