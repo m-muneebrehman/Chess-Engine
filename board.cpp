@@ -268,47 +268,47 @@ void Board::print_piece(Bitboard piece) const {
     print_bitboard(piece);
 }
 
-// Generate all white pieces' legal moves
-Bitboard Board::generate_White_pieces() const{
+// Generate all white pieces attack moves
+Bitboard Board::generate_White_pieces() const {
     return (
-        generate_king_moves(whiteKing, emptySquares) |        // King moves
-        generate_queen_moves(whiteQueen, emptySquares) |      // Queen moves
-        generate_bishop_moves(whiteBishop1, emptySquares) |   // Bishop 1 moves
-        generate_bishop_moves(whiteBishop2, emptySquares) |   // Bishop 2 moves
-        generate_knight_moves(whiteKnight1, emptySquares) |   // Knight 1 moves
-        generate_knight_moves(whiteKnight2, emptySquares) |   // Knight 2 moves
-        generate_rook_moves(whiteRook1, emptySquares) |       // Rook 1 moves
-        generate_rook_moves(whiteRook2, emptySquares) |       // Rook 2 moves
-        generate_white_pawn_moves(whitePawnA, emptySquares) | // White Pawn A moves
-        generate_white_pawn_moves(whitePawnB, emptySquares) | // White Pawn B moves
-        generate_white_pawn_moves(whitePawnC, emptySquares) | // White Pawn C moves
-        generate_white_pawn_moves(whitePawnD, emptySquares) | // White Pawn D moves
-        generate_white_pawn_moves(whitePawnE, emptySquares) | // White Pawn E moves
-        generate_white_pawn_moves(whitePawnF, emptySquares) | // White Pawn F moves
-        generate_white_pawn_moves(whitePawnG, emptySquares) | // White Pawn G moves
-        generate_white_pawn_moves(whitePawnH, emptySquares)   // White Pawn H moves
+        generate_king_attacks(whiteKing, blackPieces) |        // King attacks
+        generate_queen_attacks(whiteQueen, whitePieces, blackPieces) |    // Queen attacks
+        generate_bishop_attacks(whiteBishop1, whitePieces, blackPieces) |   // Bishop 1 attacks
+        generate_bishop_attacks(whiteBishop2, whitePieces, blackPieces) |   // Bishop 2 attacks
+        generate_knight_attacks(whiteKnight1, blackPieces) |   // Knight 1 attacks
+        generate_knight_attacks(whiteKnight2, blackPieces) |   // Knight 2 attacks
+        generate_rook_attacks(whiteRook1, whitePieces, blackPieces) |       // Rook 1 attacks
+        generate_rook_attacks(whiteRook2, whitePieces, blackPieces) |       // Rook 2 attacks
+        generate_pawn_attacks(whitePawnA, true, blackPieces) | // White Pawn A attacks
+        generate_pawn_attacks(whitePawnB, true, blackPieces) | // White Pawn B attacks
+        generate_pawn_attacks(whitePawnC, true, blackPieces) | // White Pawn C attacks
+        generate_pawn_attacks(whitePawnD, true, blackPieces) | // White Pawn D attacks
+        generate_pawn_attacks(whitePawnE, true, blackPieces) | // White Pawn E attacks
+        generate_pawn_attacks(whitePawnF, true, blackPieces) | // White Pawn F attacks
+        generate_pawn_attacks(whitePawnG, true, blackPieces) | // White Pawn G attacks
+        generate_pawn_attacks(whitePawnH, true, blackPieces)   // White Pawn H attacks
     );
 }
 
-// Generate all black pieces' legal moves
-Bitboard Board::generate_Black_pieces() const{
+// Generate all black pieces' attack moves
+Bitboard Board::generate_Black_pieces() const {
     return (
-        generate_king_moves(blackKing, emptySquares) |        // King moves
-        generate_queen_moves(blackQueen, emptySquares) |      // Queen moves
-        generate_bishop_moves(blackBishop1, emptySquares) |   // Bishop 1 moves
-        generate_bishop_moves(blackBishop2, emptySquares) |   // Bishop 2 moves
-        generate_knight_moves(blackKnight1, emptySquares) |   // Knight 1 moves
-        generate_knight_moves(blackKnight2, emptySquares) |   // Knight 2 moves
-        generate_rook_moves(blackRook1, emptySquares) |       // Rook 1 moves
-        generate_rook_moves(blackRook2, emptySquares) |       // Rook 2 moves
-        generate_black_pawn_moves(blackPawnA, emptySquares) | // Black Pawn A moves
-        generate_black_pawn_moves(blackPawnB, emptySquares) | // Black Pawn B moves
-        generate_black_pawn_moves(blackPawnC, emptySquares) | // Black Pawn C moves
-        generate_black_pawn_moves(blackPawnD, emptySquares) | // Black Pawn D moves
-        generate_black_pawn_moves(blackPawnE, emptySquares) | // Black Pawn E moves
-        generate_black_pawn_moves(blackPawnF, emptySquares) | // Black Pawn F moves
-        generate_black_pawn_moves(blackPawnG, emptySquares) | // Black Pawn G moves
-        generate_black_pawn_moves(blackPawnH, emptySquares)   // Black Pawn H moves
+        generate_king_attacks(blackKing, whitePieces) |        // King attacks
+        generate_queen_attacks(blackQueen, blackPieces, whitePieces) |    // Queen attacks
+        generate_bishop_attacks(blackBishop1, blackPieces, whitePieces) |   // Bishop 1 attacks
+        generate_bishop_attacks(blackBishop2, blackPieces, whitePieces) |   // Bishop 2 attacks
+        generate_knight_attacks(blackKnight1, whitePieces) |   // Knight 1 attacks
+        generate_knight_attacks(blackKnight2, whitePieces) |   // Knight 2 attacks
+        generate_rook_attacks(blackRook1, blackPieces, whitePieces) |       // Rook 1 attacks
+        generate_rook_attacks(blackRook2, blackPieces, whitePieces) |       // Rook 2 attacks
+        generate_pawn_attacks(blackPawnA, false, whitePieces) | // Black Pawn A attacks
+        generate_pawn_attacks(blackPawnB, false, whitePieces) | // Black Pawn B attacks
+        generate_pawn_attacks(blackPawnC, false, whitePieces) | // Black Pawn C attacks
+        generate_pawn_attacks(blackPawnD, false, whitePieces) | // Black Pawn D attacks
+        generate_pawn_attacks(blackPawnE, false, whitePieces) | // Black Pawn E attacks
+        generate_pawn_attacks(blackPawnF, false, whitePieces) | // Black Pawn F attacks
+        generate_pawn_attacks(blackPawnG, false, whitePieces) | // Black Pawn G attacks
+        generate_pawn_attacks(blackPawnH, false, whitePieces)   // Black Pawn H attacks
     );
 }
 
