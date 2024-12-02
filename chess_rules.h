@@ -12,7 +12,7 @@
 bool is_check(const Board& board, bool isWhite);
 
 // Check if a move causes a check
-bool causes_check(const Board& board, int from, int to, bool isWhite,Bitboard &piece);
+bool causes_check( Board& board, int from, int to, bool isWhite,Bitboard &piece);
 
 // Check if the player is in checkmate
 bool is_checkmate(const Board& board, bool isWhite);

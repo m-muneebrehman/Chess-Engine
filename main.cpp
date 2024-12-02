@@ -17,7 +17,7 @@ int main() {
     //std::cout<<is_check(board, false)<<"\n";
     board.make_move(D3, B5, board.whiteQueen); 
     //std::cout<<is_check(board, false);
-     std::cout<<causes_check(board,D7,D6,false,board.blackPawnD);
+     std::cout<<"The check is being caused "<<causes_check(board,D7,D6,false,board.blackPawnD)<<"\n";
     // board.make_move(D7,D6,board.blackPawnD);
 
 
