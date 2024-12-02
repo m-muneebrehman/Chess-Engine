@@ -13,14 +13,15 @@ bool is_check(const Board& board, bool isWhite) {
 
 }
 
-// bool causes_check(const Board& board, int from, int to, bool isWhite,Bitboard &piece) {
-//     // Simulate the move and check if the king is in check
-//     Board tempBoard = board; // Create a copy of the board
-//     Bitboard tempPiece = piece;
-//     tempBoard.make_move(from, to , tempPiece);
-//     //tempBoard.make_move(from, to, isWhite ? board.whitePawnH : board.blackPawnA);  // Move piece
-//     return is_check(tempBoard, isWhite);  // Check if the move results in a check
-// }
+bool causes_check(const Board& board, int from, int to, bool isWhite,Bitboard &piece) {
+    // Simulate the move and check if the king is in check
+    Board tempBoard = board; // Create a copy of the board
+    print_board(tempBoard);
+        //Bitboard tempPiece = piece;
+    tempBoard.make_move(from, to , piece);
+    //tempBoard.make_move(from, to, isWhite ? board.whitePawnH : board.blackPawnA);  // Move piece
+    return is_check(tempBoard, isWhite);  // Check if the move results in a check
+}
 
 // bool is_checkmate(const Board& board, bool isWhite) {
 //     // If the king is in check and there are no valid moves to escape, it's checkmate
